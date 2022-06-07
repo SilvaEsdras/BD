@@ -1,0 +1,249 @@
+CREATE TABLE "socio" (
+  "nome" varchar(45),
+  "telefone" varchar(11),
+  "endereco" varchar(45),
+  "cidade" varchar(35),
+  "situacao" varchar(20),
+  "cod_socio" serial,
+  PRIMARY KEY ("cod_socio")
+);
+
+
+CREATE INDEX "" ON  "socio" ("nome", "telefone", "endereco", "cidade", "situacao");
+
+
+CREATE TABLE "dependente" (
+  "id_dependente" serial,
+  "nome" varchar(45),
+  "data_nascimento" date,
+  "sexo" varchar(1),
+  "cod_socio" serial,
+  PRIMARY KEY ("id_dependente"),
+  CONSTRAINT "FK_dependente.cod_socio"
+    FOREIGN KEY ("cod_socio")
+      REFERENCES "socio"("cod_socio")
+);
+
+
+CREATE INDEX "" ON  "dependente" ("nome", "data_nascimento", "sexo");
+
+
+CREATE TABLE "atividade_esportiva" (
+  "descricao" varchar(40),
+  "valor" integer,
+  "turno" varchar(1),
+  "cod_esportiva" serial,
+  PRIMARY KEY ("cod_esportiva")
+);
+
+
+CREATE INDEX "" ON  "atividade_esportiva" ("descricao", "valor", "turno");
+
+
+CREATE TABLE "modalidade_esportiva" (
+  "cod_socio" serial,
+  "cod_esportiva" serial,
+  PRIMARY KEY ("cod_socio", "cod_esportiva"),
+  CONSTRAINT "FK_modalidade_esportiva.cod_socio"
+    FOREIGN KEY ("cod_socio")
+      REFERENCES "socio"("cod_socio"),
+  CONSTRAINT "FK_modalidade_esportiva.cod_esportiva"
+    FOREIGN KEY ("cod_esportiva")
+      REFERENCES "atividade_esportiva"("cod_esportiva")
+);
+
+
+CREATE TABLE "cadastro_atividade" (
+  "cod_esportiva" serial,
+  "cod_dependente" serial,
+  PRIMARY KEY ("cod_esportiva", "cod_dependente"),
+  CONSTRAINT "FK_cadastro_atividade.cod_esportiva"
+    FOREIGN KEY ("cod_esportiva")
+      REFERENCES "atividade_esportiva"("cod_esportiva"),
+  CONSTRAINT "FK_cadastro_atividade.cod_dependente"
+    FOREIGN KEY ("cod_dependente")
+      REFERENCES "dependente"("id_dependente")
+);
+
+
+
+SELECT * FROM public.socio
+SELECT * FROM public.dependente
+SELECT * FROM public.atividade_esportiva
+SELECT * FROM public.modalidade_esportiva
+SELECT * FROM public.cadastro_atividade
+
+
+UPDATE socio.cod_socio
+
+
+INSERT INTO socio (nome, telefone, endereco, cidade, situacao)
+	VALUES
+	('Ester Sousa e Silva', 86998232575, 'Rua mucuripe', 'Teresina', 'Ativo'),
+	('Eudes Monterio', 86999353520, 'Rua nove', 'Parnaíba', 'Ativo'),
+	('Maria vanha de sousa', 86999355320, 'Rua oitenta', 'Parnaíba', 'Ativo'),
+	('Eudes Monterio', 86999803520, 'Rua quatro', 'Parnaíba', 'Ativo'),
+	('Vita Maria', 86998232575, 'Rua caucaia', 'Campo maior', 'Ativo'),
+	('Antonio Carlos', 86998352841, 'Rua macaúba', 'Timon', 'Ativo'),
+	('Marlom Santos', 86998352521, 'Rua tres', 'Altos', 'Ativo');
+
+
+
+INSERT INTO dependente (nome, data_nascimento, sexo)
+	VALUES
+	('Antonia Sousa e Silva', '18/01/1820', 'F'),
+	('Jose Monterio', '21/02/1850', 'M'),
+	('Antonieta de sousa', '01/03/1800', 'F'),
+	('Lucas Monterio', '18/04/1880', 'M'),
+	('Rita Maria', '10/05/1890', 'F'),
+	('Antonio Bandeira', '11/05/1870', 'M'),
+	('Antonia Benevenuto', '21/05/1810', 'F');
+	
+
+INSERT INTO atividade_esportiva (descricao, valor, turno)
+	VALUES
+	('Vôlei', 32.90, 'N'),
+	('Basquete', 35.75, 'M'),
+	('Futebol', 31.21, 'T'),
+	('Boliche', 31.60, 'M'),
+	('Futsal', 33.29, 'T'),
+	('Natação', 37.60, 'M'),
+	('Natação', 37.60, 'T'),
+	('Natação', 37.60, 'N'),
+	('Hidroginástica', 39.60, 'M'),
+	('Hidroginástica', 39.60, 'T'),
+	('Hidroginástica', 39.60, 'N');
+
+
+INSERT INTO modalidade_esportiva (cod_socio, cod_esportiva)
+	VALUES
+	('1', '5'),
+	('2', '4'),
+	('3', '3'),
+	('4', '2'),
+	('5', '1'),
+	('6', '12'),
+	('7', '11'),
+	('8', '10'),
+	('9', '9'),
+	('10', '8'),
+	('11', '7'),
+	('12', '6'),
+	('18', '13'),
+	('17', '14'),
+	('16', '15');
+
+
+INSERT INTO cadastro_atividade (cod_esportiva, cod_dependente)
+	VALUES
+	('6', '1'),
+	('7', '2'),
+	('8', '3'),
+	('9', '4'),
+	('10', '5'),
+	('11', '5'),
+	('12', '4'),
+	('13', '3'),
+	('14', '2'),
+	('15', '1'),
+	('18', '1');
+
+
+--a)Criar uma consulta com o nome e cidade de todos os sócios.
+SELECT nome, cidade
+FROM socio;
+
+--Consultar nome, data de nascimento dos dependentes
+SELECT nome, data_nascimento
+FROM dependente;
+
+--Consultar descrição, valor e turno das atividades
+SELECT descricao, valor, turno
+FROM atividade_esportiva;
+
+--Consultar nome e cidade dos sócios de Timon
+SELECT nome, cidade
+FROM socio
+	WHERE cidade = 'Timon';
+
+--Consultar as atividades a noite
+SELECT turno
+FROM atividade_esportiva
+	WHERE turno = 'N';
+
+--Consultar as atividades no turno manhã menor que 35,00
+SELECT valor
+FROM atividade_esportiva
+	WHERE turno = 'M' AND valor < 35;
+
+
+--b)Criar uma consulta com o nome do sócio e o nome de seus dependentes.
+SELECT socio.nome,dependente.nome
+FROM socio
+	INNER JOIN dependente ON socio.cod_socio = dependente.cod_socio;
+
+SELECT * FROM public.cadastro_atividade
+
+--c)Criar uma consulta que retorne o nome do dependente e os esportes que ele pratica.
+SELECT d.nome, ae.descricao
+FROM dependente as d
+	INNER JOIN cadastro_atividade as cad
+		ON d.id_dependente = cad.cod_dependente
+	INNER JOIN atividade_esportiva as ae
+		ON cad.cod_esportiva = ae.cod_esportiva
+ORDER BY d.nome;
+
+
+--d)Criar uma consulta que retorne o nome de todos os sócios praticantes de natação.
+SELECT s.nome, ae.descricao
+FROM socio as s
+	INNER JOIN modalidade_esportiva as me
+		ON s.cod_socio = me.cod_socio
+	INNER JOIN atividade_esportiva as ae
+		ON me.cod_esportiva = ae.cod_esportiva
+WHERE ae.descricao = 'Natação';
+
+
+--e)Criar uma consulta que retorne todos os sócios que possuem dependentes masculino que fazem futebol.
+SELECT s.nome, d.nome, d.sexo, ae.descricao
+FROM socio as s
+	INNER JOIN dependente as d
+		ON s.cod_socio = d.cod_socio
+	INNER JOIN cadastro_atividade as cad
+		ON d.id_dependente = cad.cod_dependente
+	INNER JOIN atividade_esportiva as ae
+		ON cad.cod_esportiva = ae.cod_esportiva
+WHERE ae.descricao = 'Futebol' AND d.sexo = 'F';
+
+
+--f. Criar uma consulta que retorne quantos dependentes praticam hidroginástica no turno da noite.
+
+
+--g. Criar uma consulta que informe quanto gasta o sócio “Antonio” com esporte.
+
+
+
+SELECT descricao
+FROM atividade_esportiva
+ORDER BY descricao ASC;
+
+SELECT descricao
+FROM atividade_esportiva
+ORDER BY descricao DESC;
+
+
+SELECT DISTINCT descricao
+FROM atividade_esportiva
+ORDER BY descricao ASC;
+
+
+SELECT * FROM atividade_esportiva
+LIMIT 3;
+
+SELECT * FROM atividade_esportiva
+LIMIT 3 OFFSET 2;
+
+UPPER() UPPER(a.nome) LIKE '%ANTONIO%';
+LOWER() LOWER(a.nome) LIKE '%antonio';
+ILIKE a.nome ILIKE '%antonio%';
+
