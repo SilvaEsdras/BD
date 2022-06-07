@@ -1,0 +1,356 @@
+–Criar um arquivo texto contendo os comandos DDL da SQL para:
+–criação das tabelas, com as chaves primárias e as restrição de integridade referencial (chaves estrangeiras)
+–restrições de valor e criação de índices
+
+CREATE TABLE "endereço" (
+  "idenderecos" INTEGER,
+  "logradouro" VARCHAR(100),
+  "numero" INTEGER,
+  "complemento" VARCHAR(30),
+  "bairro" VARCHAR(50),
+  "cep" INTEGER,
+  "cidade" VARCHAR(100),
+  "sigla_estado" VARCHAR(2),
+  PRIMARY KEY ("idenderecos")
+);
+
+CREATE INDEX "" ON  "Endereço" ("numero", "complemento", "bairro", "cep", "cidade", "sigla_estado");
+
+CREATE TABLE "forma_pagamento" (
+  "idformapag" INTEGER,
+  "descricao" VARCHAR(50),
+  PRIMARY KEY ("idformapag")
+);
+
+CREATE INDEX "" ON  "forma_pagamento" ("descricao");
+
+CREATE TABLE "status_pedido" (
+  "idstatuspedido" INTEGER,
+  "descricao" VARCHAR(50),
+  PRIMARY KEY ("idstatuspedido")
+);
+
+CREATE INDEX "" ON  "status_pedido" ("descricao");
+
+CREATE TABLE "pedidos" (
+  "numero_pedidos" INTEGER,
+  "cliente_email" VARCHAR(30),
+  "endereco_entrega" INTEGER,
+  "forma_pagamento" INTEGER,
+  "status_pedido" INTEGER,
+  "data_expedicao" DATE,
+  "valor_total" FLOAT,
+  PRIMARY KEY ("numero_pedidos"),
+  CONSTRAINT "FK_pedidos.status_pedido"
+    FOREIGN KEY ("status_pedido")
+      REFERENCES "status_pedido"("idstatuspedido"),
+  CONSTRAINT "FK_pedidos.forma_pagamento"
+    FOREIGN KEY ("forma_pagamento")
+      REFERENCES "forma_pagamento"("idformapag")
+);
+
+CREATE INDEX "" ON  "pedidos" ("data_expedicao", "valor_total");
+
+CREATE TABLE "cliente" (
+  "email" VARCHAR(50),
+  "endereco" INTEGER,
+  "nome" VARCHAR,
+  "data_nascimento" DATE,
+  "fone_residencial" INTEGER,
+  "fone_celular" INTEGER,
+  "cpf" INTEGER,
+  "senha" VARCHAR(8),
+  PRIMARY KEY ("email")
+);
+
+CREATE INDEX "" ON  "cliente" ("nome", "data_nascimento", "fone_residencial", "fone_celular", "cpf", "senha");
+
+CREATE TABLE "loja" (
+  "numero_loja" INTEGER,
+  "endereço" INTEGER,
+  "nome" VARCHAR(100),
+  "telefone_contato" INTEGER,
+  PRIMARY KEY ("numero_loja")
+);
+
+CREATE INDEX "" ON  "loja" ("nome", "telefone_contato");
+
+CREATE TABLE "tipo_mercadoria" (
+  "idtipomercadoria" INTEGER,
+  "descricao" VARCHAR(100),
+  PRIMARY KEY ("idtipomercadoria")
+);
+
+CREATE TABLE "mercadoria" (
+  "codigo" INTEGER,
+  "tipo_mercadoria" INTEGER,
+  "descricao" VARCHAR(300),
+  "preco_venda" FLOAT,
+  PRIMARY KEY ("codigo"),
+  CONSTRAINT "FK_mercadoria. tipo_mercadoria"
+    FOREIGN KEY ("tipo_mercadoria")
+      REFERENCES "tipo_mercadoria"("idtipomercadoria")
+);
+
+CREATE INDEX "" ON  "mercadoria" ("descricao", "preco_venda");
+
+CREATE TABLE "loja_mercadoria" (
+  "loja" INTEGER,
+  "mercadoria" INTEGER,
+  "quantidade" INTEGER,
+  PRIMARY KEY ("loja", "mercadoria"),
+  CONSTRAINT "FK_Loja_mercadoria.loja"
+    FOREIGN KEY ("loja")
+      REFERENCES "loja"("numero_loja"),
+  CONSTRAINT "FK_loja_mercadoria.mercadoria"
+    FOREIGN KEY ("mercadoria")
+      REFERENCES "mercadoria"("codigo")
+);
+
+CREATE INDEX "" ON  "loja_mercadoria" ("quantidade");
+
+CREATE TABLE "pedido_mercadorias" (
+  "pedido" INTEGER,
+  "mercadoria" INTEGER,
+  "loja" INTEGER,
+  "status" INTEGER,
+  "quantidade_pedida" INTEGER,
+  "data_entrega" DATE,
+  "valor_unitario" FLOAT,
+  PRIMARY KEY ("pedido", "mercadoria", "loja"),
+  CONSTRAINT "FK_pedido_mercadorias.status"
+    FOREIGN KEY ("status")
+      REFERENCES "status_pedido"("idstatuspedido"),
+  CONSTRAINT "FK_pedido_mercadorias.pedido"
+    FOREIGN KEY ("pedido")
+      REFERENCES "pedidos"("numero_pedidos"),
+  CONSTRAINT "FK_pedido_mercadorias.mercadoria"
+    FOREIGN KEY ("mercadoria","loja")
+      REFERENCES "loja_mercadoria"("mercadoria","loja")
+);
+CREATE INDEX "" ON  "pedido_mercadorias" ("quantidade_pedida", "data_entrega", "valor_unitario");
+
+
+–Criar um arquivo texto contendo comandos de manipulação de dados (DML):
+- inserir alguns dados de teste (que demonstrem o resultado das consultas do próximo item)
+
+
+INSERT INTO endereco ("idenderecos", logradouro, numero, complemento, cep, bairro, cidade, sigla_estado)
+	VALUES
+	(1, 'Rua mucuripe', 2131, 'Casa', 64000-020, 'Centro', 'Teresina', 'PI'),
+	(2, 'Rua nove', 250 , 'Residência', 65028-520, 'Mafrense', 'Timon', 'MA'),
+	(3, 'Rua oitenta', 82, 'Residência', 64000-060, 'Promorar', 'Campo Maior', 'PI'),
+	(4, 'Rua quatro',1658, 'Casa', 64000-070, 'Jockey', 'Parnaíba', 'PI'),
+	(5, 'Rua caucaia', 2365, 'Residência', 64010-080, 'Centro', 'Teresina', 'PI'),
+	(6, 'Rua macaúba', 147, 'Pcomercial', 65000-110, 'Mafrense', 'Timon', 'MA'),
+	(7, 'Rua tres', 8741, 'Residência', 64000-090, 'Centro', 'Campo Maior', 'PI'),
+	(8, 'Rua treze' , 3698, 'Residência', 64000-128, 'Promorar', 'Teresina', 'PI'),
+	(9, 'Rua vinte' , 258 , 'Casa', 64000-120, 'Jockey', 'Parnaíba', 'PI'),
+	(10, 'Rua onze' , 23 , 'Ponto comercial', 64000-160, 'Centro', 'Picos', 'PI'),
+	(11, 'Rua sete' , 4 , 'Casa', 64000-150, 'Mafrense', 'Teresina', 'PI'),
+	(12, 'Rua dez' , 258 , 'Residência', 65055-285, 'Jockey', 'Timon', 'MA');
+SELECT * FROM public.endereco
+
+
+INSERT INTO forma_pagamento ("descricao", "idformapag")
+	VALUES
+	('Cartão de crédito',1),
+	('Pix', 2),
+	('Débido', 3),
+	('Crédiario', 4),
+	('Espécie', 5);
+SELECT * FROM public.forma_pagamento
+
+
+INSERT INTO loja (numero_loja, endereco, nome, telefone_contato)
+	VALUES
+	(1, 2, 'Shopping', 32220520),
+	(2, 4, 'Dirceu', 32586536),
+	(3, 6, 'Poty', 32218252),
+	(4, 8, 'Riverside', 33586921),
+	(5, 10, 'Magazine', 32212132);
+SELECT * FROM public.loja
+
+
+INSERT INTO tipo_mercadoria (descricao, idtipomercadoria)
+	VALUES
+	('Eletrodoméstico', 1),
+	('Informática', 2),
+	('Móveis', 3),
+	('Celulares', 4),
+	('Tv', 5),
+	('Eletro', 6);
+SELECT * FROM public.tipo_mercadoria
+
+
+INSERT INTO mercadoria (codigo, tipo_mercadoria, descricao, preco_venda)
+	VALUES
+	(1, 6, 'Fogão', 599.99),
+	(2, 5, 'Televisão', 899.99),
+	(3, 4, 'Iphone', 1999.99),
+	(4, 3, 'Quarda-Roupa', 499.99),
+	(5, 5, 'Televisão', 999.99),
+	(6, 2, 'Mouse', 29.99),
+	(7, 1, 'Liquidificador', 299.99);
+SELECT * FROM public.mercadoria
+
+
+INSERT INTO loja_mercadoria (loja, mercadoria, quantidade)
+	VALUES
+	(1, 7, 22),
+	(1, 6, 29),
+	(1, 5, 19),
+	(1, 4, 31),
+	(1, 3, 12),
+	(2, 7, 22),
+	(2, 6, 29),
+	(2, 5, 19),
+	(2, 4, 31),
+	(3, 3, 12),
+	(3, 7, 22),
+	(3, 6, 29),
+	(3, 5, 19),
+	(3, 4, 31),
+	(3, 2, 12),
+	(4, 7, 22),
+	(4, 6, 29),
+	(4, 5, 19),
+	(4, 4, 31),
+	(4, 3, 12),
+	(5, 7, 22),
+	(5, 6, 29),
+	(5, 5, 19),
+	(5, 4, 31),
+	(5, 3, 12);
+SELECT * FROM public.loja_mercadoria
+
+
+INSERT INTO status_pedido (descricao, idstatuspedido)
+	VALUES
+	('Pedido efetuado', 1),
+	('Aguardando pagamento', 2),
+	('Pedido Pago', 3),
+	('Pedido Enviado', 4),
+	('Pedido Entregue', 5),
+	('Pedido Pronto Para Retirada', 6),
+	('Pedido Cancelado', 7),
+	('Outros Status', 8);
+SELECT * FROM public.status_pedido
+
+
+INSERT INTO cliente (email, endereco, nome, data_nascimento, fone_residencial, fone_celular, cpf, senha)
+	VALUES
+	('ester@pintos.com.br', 1, 'Ester Sousa e Silva', '20/02/1992', 32212123, 869992580, 056987852, 'ester123'),
+	('jose@pintos.com.br', 2, 'José Eudes silva', '20/02/1992', 32212523, 869981580, 056695654, 'jose123'),
+	('vita@pintos.com.br', 5, 'Vita Silva de Sousa', '20/02/1992', 38962123, 869982580, 056525215, 'vita123'),
+	('vanha@pintos.com.br', 7, 'Vanha De Sousa e Silva', '20/02/1992', 32225983, 869322820, 147585215, 'vanha123'),
+	('lucas@pintos.com.br', 9, 'Lucas Sousa e Silva', '20/02/1992', 32588923, 869978950, 741685255, 'lucas123'),
+	('antonio@pintos.com.br', 11, 'Antonio Da Silva', '20/02/1992', 32892323, 869932825, 056385215, 'antonio');
+SELECT * FROM public.cliente
+
+
+INSERT INTO pedidos (cliente_email, numero_pedidos, endereco_entrega, forma_pagamento, status_pedido, data_expedicao, valor_total)
+	VALUES
+	('vita@pintos.com.br', 3, 7, 3, 6, '17/04/2022', 999.99)
+	('ester@pintos.com.br', 1, 11, 5, 8, '15/02/2022', 299.99),
+	('jose@pintos.com.br', 2, 9, 4, 7, '16/03/2022', 29.99),
+	('vita@pintos.com.br', 3, 7, 3, 6, '17/04/2022', 999.99),
+	('vanha@pintos.com.br', 4, 5, 2, 5, '18/05/2022', 499.99),
+	('lucas@pintos.com.br', 5, 1, 1, 4, '19/06/2022', 1999.99),
+	('ester@pintos.com.br', 6, 11, 5, 8, '15/02/2022', 299.99),
+	('jose@pintos.com.br', 7, 9, 4, 7, '16/03/2022', 29.99),
+	('vita@pintos.com.br', 8, 7, 3, 6, '17/04/2022', 999.99),
+	('vanha@pintos.com.br', 9, 5, 2, 5, '18/05/2022', 499.99),
+	('lucas@pintos.com.br', 10, 1, 1, 4, '19/06/2022', 1999.99),
+	('ester@pintos.com.br', 11, 11, 5, 8, '15/01/2022', 299.99),
+	('jose@pintos.com.br', 12, 9, 4, 7, '16/01/2022', 29.99),
+	('vita@pintos.com.br', 13, 7, 3, 6, '17/01/2022', 999.99),
+	('vanha@pintos.com.br', 14, 5, 2, 5, '18/01/2022', 499.99),
+	('lucas@pintos.com.br', 15, 1, 1, 4, '19/01/2022', 1999.99),
+	('vita@pintos.com.br',16, 7, 3, 6, '17/04/2022', 999.99);
+SELECT * FROM public.pedidos
+	
+	
+INSERT INTO pedido_mercadorias (pedido, mercadoria, loja, status, quantidade_pedida, data_entrega, valor_unitario)
+	VALUES
+	(1, 7, 5, 8, 1, '20/02/2022', 299.99),
+	(2, 6, 4, 7, 2, '21/03/2022', 29.99),
+	(3, 5, 3, 6, 1, '23/04/2022', 999.99),
+	(4, 4, 2, 5, 1, '24/05/2022', 499.99),
+	(5, 3, 1, 4, 1, '25/06/2022', 1999.99),
+	(2, 3, 4, 3, 1, '26/07/2022', 899.99), 
+	(3, 2, 3, 2, 1, '27/08/2022', 599.99),
+	(4, 4, 1, 1, 1, '28/09/2022', 499.99),
+	(6, 7, 5, 8, 1, '20/02/2022', 299.99),
+	(7, 6, 4, 7, 2, '21/03/2022', 29.99),
+	(8, 5, 3, 6, 1, '23/04/2022', 999.99),
+	(9, 4, 2, 5, 1, '24/05/2022', 499.99),
+	(10, 3, 1, 4, 1, '25/06/2022', 1999.99),
+	(11, 3, 4, 3, 1, '26/07/2022', 899.99), 
+	(12, 2, 3, 2, 1, '27/08/2022', 599.99),
+	(13, 4, 1, 1, 1, '28/09/2022', 499.99);
+SELECT * FROM public.pedido_mercadorias
+
+
+SELECT * FROM public.endereco
+SELECT * FROM public.forma_pagamento
+SELECT * FROM public.loja
+SELECT * FROM public.tipo_mercadoria
+SELECT * FROM public.mercadoria
+SELECT * FROM public.loja_mercadoria
+SELECT * FROM public.status_pedido
+SELECT * FROM public.cliente
+SELECT * FROM public.pedidos
+SELECT * FROM public.pedido_mercadorias
+
+
+
+
+--Alterar o nome de um cliente para ‘Almir’
+UPDATE cliente 
+SET nome = 'Almir' 
+WHERE nome = 'José Eudes silva';
+
+
+--Aumentar em 10% o valor de todas as televisões
+UPDATE mercadoria
+SET preco_venda = 899.99 * 1.1
+WHERE codigo = 2;
+
+
+--Apagar linhas específicas da tabela cliente
+DELETE FROM cliente
+WHERE endereco = 2;
+
+
+
+–Consultas simples (junção, funções agregadas)
+–Liste todos os clientes ordenados por ordem crescente e seus endereços
+SELECT nome, endereco FROM cliente
+ORDER BY nome ASC;
+
+
+--Quantos pedidos foram expedidos no mês de janeiro
+SELECT * FROM pedidos
+ORDER BY data_expedicao ASC
+LIMIT 5;
+
+
+--Quantos pedidos foram entregues em algum endereço diferente do endereço do cliente
+SELECT COUNT(cliente.nome)
+FROM cliente JOIN pedidos
+ON cliente.email = pedidos.cliente_email
+WHERE cliente.endereco != pedidos.endereco_entrega;
+
+
+
+--Qual a média de valor gasto pelos clientes anualmente
+SELECT AVG(valor_total) FROM pedidos;
+
+
+--Quem é o cliente com maior número de pedidos
+SELECT MAX(cliente_email) FROM pedidos;
+
+
+--Qual a mercadoria mais vendida
+SELECT MAX(mercadoria) FROM pedido_mercadorias;
