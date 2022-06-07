@@ -1,0 +1,199 @@
+-- Recuperar todas as informações da tabela cd.facilities?
+
+SELECT *
+FROM cd.facilities;
+##   facid            name membercost guestcost initialoutlay monthlymaintenance
+## 1     0  Tennis Court 1        5.0      25.0         10000                200
+## 2     1  Tennis Court 2        5.0      25.0          8000                200
+## 3     2 Badminton Court        0.0      15.5          4000                 50
+## 4     3    Table Tennis        0.0       5.0           320                 10
+## 5     4  Massage Room 1       35.0      80.0          4000               3000
+## 6     5  Massage Room 2       35.0      80.0          4000               3000
+## 7     6    Squash Court        3.5      17.5          5000                 80
+## 8     7   Snooker Table        0.0       5.0           450                 15
+## 9     8      Pool Table        0.0       5.0           400                 15
+
+
+-- Recuperar uma lista apenas de nomes e custos das instalações?
+SELECT name, membercost
+FROM cd.facilities;
+##              name membercost
+## 1  Tennis Court 1        5.0
+## 2  Tennis Court 2        5.0
+## 3 Badminton Court        0.0
+## 4    Table Tennis        0.0
+## 5  Massage Room 1       35.0
+## 6  Massage Room 2       35.0
+## 7    Squash Court        3.5
+## 8   Snooker Table        0.0
+## 9      Pool Table        0.0
+
+
+-- Produzir uma lista de instalações que cobram uma taxa aos membros
+SELECT *
+FROM cd.facilities
+WHERE membercost > 0;
+facid	name	membercost	guestcost	initialoutlay	monthlymaintenance
+0	Tennis Court 1	5	25	10000	200
+1	Tennis Court 2	5	25	8000	200
+4	Massage Room 1	35	80	4000	3000
+5	Massage Room 2	35	80	4000	3000
+6	Squash Court	3.5	17.5	5000
+
+
+
+
+
+-- Produza uma lista de instalações que cobram uma taxa aos membros, e essa taxa é inferior a 1/50 do custo mensal de manutenção. Devolva o facid, nome da instalação, custo do membro e manutenção mensal das instalações em questão.
+SELECT facid, name, membercost, monthlymaintenance 
+FROM cd.facilities
+	WHERE
+membercost > 0 and 
+(membercost < monthlymaintenance/50.0);
+
+ffacid	name	membercost	monthlymaintenance
+4	Massage Room 1	35	3000
+5	Massage Room 2	35	3000
+
+
+-- Produza uma lista de todas as instalações com a palavra 'Tennis' em seu nome
+SELECT name
+FROM cd.facilities
+WHERE name LIKE '%Tennis%';
+##             name
+## 1 Tennis Court 1
+## 2 Tennis Court 2
+## 3   Table Tennis
+
+
+-- Recuperar os detalhes das instalações com ID 1 e 5? Tente fazer isso sem usar o operador OR.
+SELECT facid, name
+FROM cd.facilities
+WHERE facid IN (1,5);
+##   facid           name
+## 1     1 Tennis Court 2
+## 2     5 Massage Room 2
+
+
+Como você pode produzir uma lista de instalações, com cada uma rotulada como 'barata' ou 'cara' dependendo se o custo de manutenção mensal for superior a US$ 100? Devolva o nome e a manutenção mensal das instalações em questão.
+SELECT name,
+CASE
+WHEN monthlymaintenance <= 100 THEN 'cheap'
+WHEN monthlymaintenance > 100 THEN 'expensive'
+END as costs
+FROM cd.facilities;
+
+name	cost
+Tennis Court 1	expensive
+Tennis Court 2	expensive
+Badminton Court	cheap
+Table Tennis	cheap
+Massage Room 1	expensive
+Massage Room 2	expensive
+Squash Court	cheap
+Snooker Table	cheap
+Pool Table	cheap
+
+
+
+Como você pode produzir uma lista de membros que ingressaram após o início de setembro de 2012? Retorne o memid, sobrenome, nome e data de ingresso dos membros em questão.
+
+SELECT memid, surname, firstname, joindate
+FROM cd.members
+WHERE joindate >= '2012-09-01';
+
+memid	surname	firstname	joindate
+24	Sarwin	Ramnaresh	2012-09-01 08:44:42
+26	Jones	Douglas	2012-09-02 18:43:05
+27	Rumney	Henrietta	2012-09-05 08:42:35
+28	Farrell	David	2012-09-15 08:22:05
+29	Worthington-Smyth	Henry	2012-09-17 12:27:15
+30	Purview	Millicent	2012-09-18 19:04:01
+33	Tupperware	Hyacinth	2012-09-18 19:32:05
+35	Hunt	John	2012-09-19 11:32:45
+36	Crumpet	Erica	2012-09-22 08:36:38
+37	Smith	Darren	2012-09-26 18:08:45
+
+
+
+-- Produzir uma lista ordenada dos 10 primeiros sobrenomes na tabela de membros? A lista não deve conter duplicatas.
+SELECT DISTINCT surname
+FROM cd.members
+ORDER BY surname ASC
+LIMIT 10;
+ 
+##    surname
+## 1    Bader
+## 2    Baker
+## 3   Boothe
+## 4  Butters
+## 5   Coplin
+## 6  Crumpet
+## 7     Dare
+## 8  Farrell
+## 9  Genting
+## 10   GUEST
+
+
+Você, por algum motivo, quer uma lista combinada de todos os sobrenomes e todos os nomes das instalações. Sim, este é um exemplo artificial :-). Produza essa lista!
+SELECT surname 
+FROM cd.members 
+UNION SELECT name 
+FROM cd.facilities;
+
+surname
+Tennis Court 2
+Worthington-Smyth
+Badminton Court
+Pinker
+Dare
+Bader
+Mackenzie
+Crumpet
+Massage Room 1
+Squash Court
+Tracy
+Hunt
+Tupperware
+Smith
+Butters
+Rownam
+Baker
+Genting
+Purview
+Coplin
+Massage Room 2
+Joplette
+Stibbons
+Rumney
+Pool Table
+Sarwin
+Boothe
+Farrell
+Tennis Court 1
+Snooker Table
+Owen
+Table Tennis
+GUEST
+Jones
+
+ 
+ 
+-- Você gostaria de obter a data de inscrição do seu último membro. Como você pode recuperar essas informações?
+SELECT max(joindate) AS latest
+FROM cd.members;
+##                   max
+## 1 2012-09-26 18:08:45
+
+
+
+Você gostaria de obter o nome e sobrenome do(s) último(s) membro(s) que se inscreveu - não apenas a data. Como você pode fazer isso?
+SELECT firstname, surname, joindate 
+FROM cd.members 
+WHERE joindate = (SELECT max(joindate) 
+FROM cd.members);
+
+firstname	surname	joindate
+Darren	Smith	2012-09-26 18:08:45
+
+
