@@ -1,0 +1,42 @@
+-- Criando tabelas
+CREATE TABLE cliente(
+	id 			SERIAL 			PRIMARY KEY,
+	nome		VARCHAR(30)		NOT NULL,
+	telefone	VARCHAR(11),
+	email		VARCHAR(30));
+
+-- Povoando as tabelas	
+INSERT INTO cliente (
+	nome, telefone, email)
+	VALUES(
+	'Esdras Sousa Silva','86999351520', 'esdras977@gmail.com.br');
+
+-- Consultar todos os dados da tabela
+SELECT * FROM cliente;
+
+-- Povoando varias colunas ao mesmo tempo
+INSERT INTO cliente (nome, telefone, email)
+	VALUES
+	('Ester Sousa e Silva', '86998232575', 'ester977@hotmail.com.br'),
+	('Eudes Monterio', '86999353520', 'eudes977@yahoo.com.br')
+	('Vita Maria', '86998232575', 'vita977@uol.com.br');
+
+-- Criando tabelas
+CREATE TABLE produto(
+	id 			SERIAL 			PRIMARY KEY,
+	descricao	VARCHAR(30)		NOT NULL,
+	preco		NUMERIC(9,2) 	DEFAULT 0);
+
+--Deletando tabela
+DROP TABLE material CASCADE;
+
+
+INSERT INTO produto (descricao, preco)
+	VALUES
+	('Eliminador_de_odores', '35.29'),
+	('Xampu', '10.21'),
+	('Sabonetes', '9.30');
+
+-- Consultar dados da tabela especifica
+SELECT preco FROM produto
+WHERE (preco < 11) AND (preco > 10);
